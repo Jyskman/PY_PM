@@ -87,6 +87,43 @@ void OPC::ISS_setup() {
 
 };
 
+void OPC::OPC_close(){
+	
+	
+	close(serial_port);
+	
+	
+};
+
+void OPC::OPC_fan(bool state) {
+	
+	unsigned char send_command[2] = {0x61, 0x03} ;
+	unsigned char send_fan_on[3] = {0x61, 0x03,0x03} ;
+	unsigned char send_fan_off[3] = {0x61, 0x03,0x02} ;
+
+	int bytes_read = 0;
+	char main_read_buf[10];
+	memset(&main_read_buf, '\0', sizeof(main_read_buf)); 
+
+
+	if ( state == true ) {
+
+		write(serial_port, send_command, 2);
+		write(serial_port, send_fan_on, 3);
+		
+	};
+	
+	if (state == false) {
+
+		write(serial_port, send_command, 2);
+		write(serial_port, send_fan_off, 3);	
+		
+	};
+
+	usleep(10000);
+	bytes_read = read(serial_port, &main_read_buf, sizeof(main_read_buf));
+};
+
 
 //~ PYBIND11_MODULE( PY_PM, m ) {
 	//~ // m.doc() = "OPC N3 module for RPI using USB ISS";
@@ -105,7 +142,9 @@ PYBIND11_MODULE( PY_PM, m ) {
 	
 	py::class_<OPC>(m, "OPC")
 	.def(py::init())
-	.def("ISS_setup",&OPC::ISS_setup);
+	.def("ISS_setup",&OPC::ISS_setup)
+	.def("OPC_close",&OPC::OPC_close)
+	.def("OPC_fan",&OPC::OPC_fan);
 	
 	
 };
