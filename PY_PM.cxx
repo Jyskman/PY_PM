@@ -125,6 +125,185 @@ void OPC::OPC_fan(bool state) {
 };
 
 
+void OPC::OPC_read_config() {
+	
+	unsigned char send_command[2] = {0x61, 0x3C} ;
+	
+	char send_command_1[63];
+	char send_command_2[63];
+	char send_command_3[46]; // 46
+	
+	int read_bytes = 0;
+	char read_buf[200];
+	// 0 - 167 is 168 values. 168 + 1, 169, is a 168 array 
+	
+	memset(&read_buf, '\0', sizeof(read_buf));
+		
+	memset(&send_command_1, 0x3C, sizeof(send_command_1));
+	memset(&send_command_2, 0x3C, sizeof(send_command_2));
+	memset(&send_command_3, 0x3C, sizeof(send_command_3));
+	
+		
+	send_command_1[0] = 0x61;
+	send_command_2[0] = 0x61;
+	send_command_3[0] = 0x61;
+		
+	
+	write(serial_port, send_command, 2);
+	read_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+	printf("Bytes read %i \n", read_bytes);
+	usleep(10000);
+	
+	write(serial_port, send_command_1, 63);
+	write(serial_port, send_command_2, 63);
+	write(serial_port, send_command_3, 46);
+		
+	usleep(10000);
+	
+	memset(&read_buf, '\0', sizeof(read_buf));
+	read_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+	printf("Bytes read %i \n", read_bytes);
+	
+	
+	// Create an array where data is copied from the read_buf. It is to avoid the FF etc bytes
+	char data_in[168];
+	memset(&data_in, 0, sizeof(data_in));
+	
+	
+	// pointer to the first element in read_buf
+	char * point_1;
+	point_1 = &read_buf[0];	
+	
+	// copy 61 elements from read_buf pos 0+2 to data_in array
+	memcpy( &data_in, point_1+2,61 );	
+	
+	
+	// now make pointer to data_in array
+	char * data_in_point;
+	data_in_point = &data_in[0]; 
+	
+	// copy 62 elements from pos 0+64 in read_buf to pos 0+61 in data_in array
+	memcpy( data_in_point+61, point_1+64,62 );
+	
+	// copy 45 elements from read_buf pos 0+127 to pos 0+123 in data_in
+	memcpy( data_in_point+123, point_1+127,45 );
+	
+	//~ for ( unsigned int i = 0; i < sizeof(data_in); i++ ) {
+		//~ printf("Byte %x at pos %i \n", data_in[i],i);
+	//~ };
+	
+	memcpy( &OPC_struct_config_variables, data_in_point,sizeof(OPC_struct_config_variables)  );
+	
+	
+	
+
+	printf("Bin Boundries ADC");
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC0);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC1);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC2);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC3);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC4);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC5);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC6);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC7);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC8);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC9);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC10);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC11);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC12);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC13);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC14);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC15);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC16);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC17);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC18);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC19);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC20);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC21);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC22);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC23);
+	printf(" ADC %i \n",OPC_struct_config_variables.binBoundriesADC24);
+
+printf("------------------------------------------------- \n");
+printf("Bin Boundries Diametors \n");
+
+
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor0);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor1);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor2);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor3);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor4);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor5);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor6);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor7);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor8);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor9);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor10);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor11);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor12);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor13);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor14);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor15);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor16);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor17);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor18);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor19);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor20);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor21);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor22);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor23);
+	printf(" Bin D %i \n",OPC_struct_config_variables.binBoundriesDiametor24);
+
+	printf("------------------------------------------------- \n");
+	printf("Bin Weights \n");
+
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings0);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings1);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings2);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings3);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings4);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings5);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings6);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings7);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings8);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings9);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings10);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings11);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings12);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings13);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings14);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings15);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings16);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings17);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings18);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings19);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings20);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings21);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings22);
+	printf(" Bin We %i \n",OPC_struct_config_variables.binWeightings23);
+	       
+       
+	printf("------------------------------------------------- \n");
+	printf("PM Diametors \n");
+
+	printf(" PM D A %i \n",OPC_struct_config_variables.pmDiametorA);
+	printf(" PM D B %i \n",OPC_struct_config_variables.pmDiametorB);
+	printf(" PM D C %i \n",OPC_struct_config_variables.pmDiametorC);
+       
+	printf("------------------------------------------------- \n");
+	printf("PM MSLNS \n");
+
+	printf(" maximumTimeOfFlight %i \n",OPC_struct_config_variables.maximumTimeOfFlight);
+	printf(" AMSamplingIntervalCount %i \n",OPC_struct_config_variables.AMSamplingIntervalCount);
+	printf(" AMIdleIntervalCount %i \n",OPC_struct_config_variables.AMIdleIntervalCount);
+	printf(" AMMaxDataArraysInFile %i \n",OPC_struct_config_variables.AMMaxDataArraysInFile);
+	printf(" AMOnlySavePMData %i \n",OPC_struct_config_variables.AMOnlySavePMData);
+	printf(" AMFanOnInIdle %i \n",OPC_struct_config_variables.AMFanOnInIdle);
+	
+	
+};
+
+
 //~ PYBIND11_MODULE( PY_PM, m ) {
 	//~ // m.doc() = "OPC N3 module for RPI using USB ISS";
 	//~ // m.def("add", &add, "Func");
@@ -144,6 +323,7 @@ PYBIND11_MODULE( PY_PM, m ) {
 	.def(py::init())
 	.def("ISS_setup",&OPC::ISS_setup)
 	.def("OPC_close",&OPC::OPC_close)
+	.def("OPC_read_config",&OPC::OPC_read_config)
 	.def("OPC_fan",&OPC::OPC_fan);
 	
 	
