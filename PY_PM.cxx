@@ -315,6 +315,22 @@ printf("Bin Boundries Diametors \n");
 	
 //~ };
 
+py::array_t<double> OPC::test_array() {
+
+double* ret = new double[5];
+
+ret[0] = 52;
+ret[1] = 21;
+
+
+return py::array_t<double>(5,ret);
+
+};
+
+
+
+
+
 PYBIND11_MODULE( PY_PM, m ) {
 	//~ m.doc() = "OPC N3 module for RPI using USB ISS";
 	//~ m.def("add", &add, "Func");
@@ -324,7 +340,8 @@ PYBIND11_MODULE( PY_PM, m ) {
 	.def("ISS_setup",&OPC::ISS_setup)
 	.def("OPC_close",&OPC::OPC_close)
 	.def("OPC_read_config",&OPC::OPC_read_config)
-	.def("OPC_fan",&OPC::OPC_fan);
+	.def("OPC_fan",&OPC::OPC_fan)
+	.def("OPC_test_array",&OPC::test_array);
 	
 	
 };

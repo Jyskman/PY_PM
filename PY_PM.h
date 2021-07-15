@@ -12,6 +12,10 @@
 #include <termios.h> // Contains POSIX terminal control definitions
 #include <unistd.h> // write(), read(), close()
 
+#include <pybind11/numpy.h>
+
+
+namespace py = pybind11;
 
 struct Status_Fan_Laser
 {
@@ -231,7 +235,7 @@ public:
 	
 	int serial_port;
 	
-	
+	py::array_t<double> test_array();
 	
 };
 
