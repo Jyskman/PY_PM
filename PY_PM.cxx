@@ -303,6 +303,151 @@ printf("Bin Boundries Diametors \n");
 	
 };
 
+void OPC::OPC_read_histogram() {
+
+
+	unsigned char send_command[2] = {0x61, 0x30} ;
+	
+	char send_command_1[63];
+	char send_command_2[26];
+
+	
+	int read_bytes = 0;
+	char read_buf[200];
+	// 0 - 167 is 168 values. 168 + 1, 169, is a 168 array 
+	
+	memset(&read_buf, '\0', sizeof(read_buf));
+		
+	memset(&send_command_1, 0x30, sizeof(send_command_1));
+	memset(&send_command_2, 0x30, sizeof(send_command_2));
+
+	
+		
+	send_command_1[0] = 0x61;
+	send_command_2[0] = 0x61;
+
+		
+	
+	write(serial_port, send_command, 2);
+	read_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+	printf("Bytes read %i \n", read_bytes);
+	usleep(10000);
+	
+	write(serial_port, send_command_1, 63);
+	write(serial_port, send_command_2, 26);
+
+		
+	usleep(10000);
+	
+	memset(&read_buf, '\0', sizeof(read_buf));
+	read_bytes = read(serial_port, &read_buf, sizeof(read_buf));
+	printf("Bytes read %i \n", read_bytes);
+	
+	// Create an array where data is copied from the read_buf. It is to avoid the FF etc bytes
+	char data_in[86];
+	memset(&data_in, 0, sizeof(data_in));
+	
+	// pointer to the first element in read_buf
+	char * point_1;
+	point_1 = &read_buf[0];	
+	
+	// copy 61 elements from read_buf pos 0+2 to data_in array
+	memcpy( &data_in, point_1+2,61 );	
+	
+	// now make pointer to data_in array
+	char * data_in_point;
+	data_in_point = &data_in[0]; 
+	
+	
+	// copy 25 elements from pos 0+64 in read_buf to pos 0+61 in data_in array
+	memcpy( data_in_point+61, point_1+64,25 );
+	
+	memcpy( &OPC_struct_histogram, data_in_point,sizeof(OPC_struct_histogram)  );
+	
+	//~ printf(" %i ",sizeof(OPC_struct_histogram));
+	
+	OPC_struct_histogram.humidity_calc = 100 * OPC_struct_histogram.humidity / ( pow(2,16.0) - 1 ) ;
+	OPC_struct_histogram.temperature_calc = -45 + 175*( OPC_struct_histogram.temperature / (pow(2,16.0) - 1) );
+	
+		
+
+	 printf(" %i ",OPC_struct_histogram.binCount0);
+	 printf(" %i ",OPC_struct_histogram.binCount1);
+	 printf(" %i ",OPC_struct_histogram.binCount2);
+	 printf(" %i ",OPC_struct_histogram.binCount3);
+	 printf(" %i ",OPC_struct_histogram.binCount4);
+	 printf(" %i ",OPC_struct_histogram.binCount5);
+	 printf(" %i ",OPC_struct_histogram.binCount6);
+	 printf(" %i ",OPC_struct_histogram.binCount7);
+	 printf(" %i ",OPC_struct_histogram.binCount8);
+	 printf(" %i ",OPC_struct_histogram.binCount9);
+	 printf(" %i ",OPC_struct_histogram.binCount10);
+	 printf(" %i ",OPC_struct_histogram.binCount11);
+	 printf(" %i ",OPC_struct_histogram.binCount12);
+	 printf(" %i ",OPC_struct_histogram.binCount13);
+	 printf(" %i ",OPC_struct_histogram.binCount14);
+	 printf(" %i ",OPC_struct_histogram.binCount15);
+	 printf(" %i ",OPC_struct_histogram.binCount16);
+	 printf(" %i ",OPC_struct_histogram.binCount17);
+	 printf(" %i ",OPC_struct_histogram.binCount18);
+	 printf(" %i ",OPC_struct_histogram.binCount19);
+	 printf(" %i ",OPC_struct_histogram.binCount20);
+	 printf(" %i ",OPC_struct_histogram.binCount21);
+	 printf(" %i ",OPC_struct_histogram.binCount22);
+	 printf(" %i ",OPC_struct_histogram.binCount23);
+
+	printf("  \n -------------------------------------------------");
+	printf("  \n Time To Cross");
+	 printf(" %i ",OPC_struct_histogram.bin1TimeToCross);
+	 printf(" %i ",OPC_struct_histogram.bin3TimeToCross);
+	 printf(" %i ",OPC_struct_histogram.bin5TimeToCross);
+	 printf(" %i ",OPC_struct_histogram.bin7TimeToCross);
+
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n Sampling Period");
+	 printf(" %i \n ",OPC_struct_histogram.samplingPeriod);
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n Sample Flow Rate");
+	 printf(" %i \n ",OPC_struct_histogram.sampleFlowRate);
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n Temperature");
+	 printf(" %i \n ",OPC_struct_histogram.temperature );
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n Humidity");
+	 printf(" %i \n ",OPC_struct_histogram.humidity );
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n pm1");
+	 printf(" %f \n ",OPC_struct_histogram.pm1);
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n pm2.5");
+	 printf(" %f \n ",OPC_struct_histogram.pm2_5);
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n pm10");
+	 printf(" %f \n ",OPC_struct_histogram.pm10);
+	 printf("  \n -------------------------------------------------");
+
+	printf("  \n -------------------------------------------------");
+	printf("  \n MSLNS");
+
+	printf(" %i ",OPC_struct_histogram.rejectCountGlitch);
+	printf(" %i ",OPC_struct_histogram.rejectCountLongTOF);
+	printf(" %i ",OPC_struct_histogram.rejectCountRatio);
+	printf(" %i ",OPC_struct_histogram.rejectCountOutOfRange);
+	printf(" %i ",OPC_struct_histogram.fanRevCount);
+	printf(" %i ",OPC_struct_histogram.laserStatus);
+	printf(" %i ",OPC_struct_histogram.checkSum);
+	
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n Temperature");
+	 printf(" %i \n ",OPC_struct_histogram.temperature_calc );
+	 printf("  \n -------------------------------------------------");
+	 printf("  \n Humidity");
+	 printf(" %i \n ",OPC_struct_histogram.humidity_calc );
+	 printf("  \n -------------------------------------------------");
+	
+	
+};
+
 
 //~ PYBIND11_MODULE( PY_PM, m ) {
 	//~ // m.doc() = "OPC N3 module for RPI using USB ISS";
@@ -317,13 +462,15 @@ printf("Bin Boundries Diametors \n");
 
 py::array_t<double> OPC::test_array() {
 
-double* ret = new double[5];
+//~ double* ret = new double[24];
+std::fill(ret, ret+24, 0.0);
+
 
 ret[0] = 52;
 ret[1] = 21;
 
 
-return py::array_t<double>(5,ret);
+return py::array_t<double>(24,ret);
 
 };
 
@@ -341,7 +488,8 @@ PYBIND11_MODULE( PY_PM, m ) {
 	.def("OPC_close",&OPC::OPC_close)
 	.def("OPC_read_config",&OPC::OPC_read_config)
 	.def("OPC_fan",&OPC::OPC_fan)
-	.def("OPC_test_array",&OPC::test_array);
+	.def("OPC_test_array",&OPC::test_array)
+	.def("OPC_read_histogram",&OPC::OPC_read_histogram);
 	
 	
 };

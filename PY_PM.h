@@ -13,7 +13,8 @@
 #include <unistd.h> // write(), read(), close()
 
 #include <pybind11/numpy.h>
-
+#include <algorithm>
+#include <iterator>
 
 namespace py = pybind11;
 
@@ -223,6 +224,9 @@ public:
 	OPC_histogramData OPC_struct_histogram;
 	
 	OPC();
+	
+	double* ret = new double[24];
+	
 	void OPC_close();	
 	
 	void ISS_setup();
